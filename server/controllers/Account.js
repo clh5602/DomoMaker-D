@@ -4,8 +4,6 @@ const { Account } = models;
 
 const loginPage = (req, res) => res.render('login');
 
-const signupPage = (req, res) => res.render('signup');
-
 const logout = (req, res) => {
   req.session.destroy();
   res.redirect('/');
@@ -62,6 +60,5 @@ module.exports = {
   login,
   loginPage,
   signup,
-  signupPage,
   logout,
 };
