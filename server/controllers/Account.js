@@ -3,6 +3,7 @@ const models = require('../models');
 const { Account } = models;
 
 const loginPage = (req, res) => res.render('login');
+const changePasswordPage = (req, res) => res.render('changePass');
 
 const logout = (req, res) => {
   req.session.destroy();
@@ -56,9 +57,34 @@ const signup = async (req, res) => {
   }
 };
 
+const changePassword = async (req, res) => {
+  const oldPass = `${req.body.oldPass}`;
+  const newPass = `${req.body.newPass}`;
+
+  if (!oldPass || !newPass) {
+    return res.status(400).json({ error: 'All fields are required!' });
+  }
+
+  const hash = await Account.generateHash(newPass);
+
+  return Account.authenticate(req.session.account.username, oldPass, async (err, account) => {
+    if (err || !account) {
+      return res.status(400).json({ error: 'Wrong password!' });
+    }
+
+    const updatedAccount = account;
+    updatedAccount.password = hash;
+    await updatedAccount.save();
+
+    return res.status(201).json({ error: 'Password updated successfully!' });
+  });
+};
+
 module.exports = {
   login,
   loginPage,
   signup,
   logout,
+  changePasswordPage,
+  changePassword,
 };
